@@ -1,0 +1,93 @@
+<?xml version="1.0"?>
+<project name="Pulsar2Tslee" default="all" basedir=".">
+
+  <record name="build.log" loglevel="info" append="false" />
+
+  <property name="version" value="1-0-0-0" />
+  <property name="built.version" value="${version}" />
+  <property name="built.name"    value="${ant.project.name}" />
+  <property name="built.vendor"  value="comviva" />
+  <tstamp>
+    <format property="built.time" pattern="dd/MM/yyyy HH:mm:ss" />
+  </tstamp>
+
+  <property name="src.dir" value="src" />
+  <property name="bin.dir" value="bin" />
+  <property name="jar.dir" value="jar" />
+
+  <property name="jar.manifest.dir"  value="${bin.dir}/META-INF" />
+  <property name="jar.manifest.file" value="${jar.manifest.dir}/MANIFEST.MF" />
+  <property name="jar.file"          value="${jar.dir}/${built.name}-${built.version}.jar" />
+  <property name="version.file"      value="${src.dir}/com/comviva/asa/constants/pulsar2tslee/constants/${ant.project.name}Version.java" />
+
+  <path id="Pulsar2Tslee.classpath">
+    <pathelement location="bin"/>
+    <pathelement location="lib/pulsar-client-2.4.1.jar"/>
+    <pathelement location="lib/pulsar-client-api-2.4.1.jar"/>
+  	<pathelement location="lib/AtsStore4Java_3-3.jar"/>
+  	<pathelement location="lib/axis.jar"/>
+  	<pathelement location="lib/commons-discovery-0.2.jar"/>
+  	<pathelement location="lib/commons-io-2.2.jar"/>
+  	<pathelement location="lib/commons-lang-2.6.jar"/>
+  	<pathelement location="lib/Foundation-3.3.0.6.jar"/>
+  	<pathelement location="lib/javax.wsdl_1.6.2.v201012040545.jar"/>
+  	<pathelement location="lib/jaxrpc.jar"/>
+  	<pathelement location="lib/log4j-1.2.17.jar"/>
+  	<pathelement location="lib/org.apache.commons.logging_1.2.0.v20180409-1502.jar"/>
+  	<pathelement location="lib/saaj.jar"/>  	
+  	<pathelement location="lib/PulsarLib-1-0-0-0.jar"/>  	
+  </path>
+
+  <target name="clean">
+    <fail message="${jar.file} is not writeable">
+      <condition>
+        <and>
+          <resourceexists>
+            <file file="${jar.file}" />
+          </resourceexists>
+          <not>
+            <isfileselected file="${jar.file}">
+              <writable />
+            </isfileselected>
+          </not>
+        </and>
+      </condition>
+    </fail>
+    <delete dir="${jar.dir}" includes="*.jar" quiet="true" />
+    <delete dir="${bin.dir}" quiet="true" />
+  </target>
+
+  <target name="init">
+    <mkdir dir="${bin.dir}" />
+    <mkdir dir="${jar.manifest.dir}" />
+    <copy includeemptydirs="false" todir="${bin.dir}">
+      <fileset dir="${src.dir}" excludes="**/*.launch" />
+    </copy>
+  </target>
+
+  <target name="compile" depends="init">
+    <javac srcdir="${src.dir}" destdir="${bin.dir}" debug="true" debuglevel="lines,vars,source" classpathref="Pulsar2Tslee.classpath" source="1.8" target="1.8" includeAntRuntime="false" />
+  </target>
+
+  <target name="pack" depends="compile">
+    <manifest file="${jar.manifest.file}">
+      <attribute name="Built-By"               value="${user.name}" />
+      <attribute name="Specification-Title"    value="${built.name}" />
+      <attribute name="Specification-Version"  value="${built.version}" />
+      <attribute name="Specification-Vendor"   value="${built.vendor}" />
+      <attribute name="Implementation-Title"   value="${built.name}" />
+      <attribute name="Implementation-Version" value="${built.version} (${built.time})" />
+      <attribute name="Implementation-Vendor"  value="${built.vendor}" />
+      <attribute name="Class-Path"             value="lib/pulsar-client-2.4.1.jar lib/pulsar-client-api-2.4.1.jar lib/AtsStore4Java_3-3.jar lib/axis.jar lib/commons-discovery-0.2.jar lib/commons-io-2.2.jar lib/commons-lang-2.6.jar lib/Foundation-3.3.0.6.jar lib/javax.wsdl_1.6.2.v201012040545.jar lib/jaxrpc.jar lib/log4j-1.2.17.jar lib/org.apache.commons.logging_1.2.0.v20180409-1502.jar lib/saaj.jar lib/PulsarLib-1-0-0-0.jar" />
+    </manifest>
+    <jar destfile="${jar.file}" basedir="${bin.dir}" manifest="${jar.manifest.file}" />
+  </target>
+
+  <target depends="init,compile,pack" name="build">
+    <echo message="Done - ${ant.project.name}: ${jar.file}" />
+  </target>
+
+  <target depends="clean,build" name="all">
+  </target>
+
+</project>
